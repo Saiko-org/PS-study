@@ -1,5 +1,8 @@
-// 프로그래머스 / 모의테스트7-3
-// solve: 55분
+/**
+ * 프로그래머스 / 77885 / 2개 이하의 다른비트
+ * https://school.programmers.co.kr/learn/courses/30/lessons/77885
+ * solve: 55분
+ */
 
 public class Solution {
 

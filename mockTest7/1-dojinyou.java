@@ -1,5 +1,8 @@
-// 프로그래머스 / 모의테스트7-1
-// solve: 9분
+/** 
+ * 프로그래머스 / 12906 / 같은 숫자는 싫어!
+ * https://school.programmers.co.kr/learn/courses/30/lessons/12906
+ * solve: 9분
+*/
 
 import java.util.Deque;
 import java.util.concurrent.LinkedBlockingDeque;

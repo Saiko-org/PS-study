@@ -1,5 +1,8 @@
-// 프로그래머스 / 모의테스트7-4
-// fail: 1시간
+/**
+ * 프로그래머스 / 77886 / 옮기기
+ * https://school.programmers.co.kr/learn/courses/30/lessons/77886
+ * fail : 1시간
+ */
 
 public class Solution {
 

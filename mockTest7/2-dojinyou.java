@@ -1,6 +1,8 @@
-// 프로그래머스 / 모의테스트7-2
-// solve: 15분
-
+/**
+ * 프로그래머스 / 42862 / 체육복
+ * https://school.programmers.co.kr/learn/courses/30/lessons/42862
+ * solve : 15분
+ */
 public class Solution {
 
   private int[] gymSuit;
