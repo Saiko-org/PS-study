@@ -12,7 +12,7 @@ public class Solution3 {
   private static final char PARTITION = 'X';
   private static final int PLACE_H = 5;
   private static final int PLACE_W = 5;
-  private boolean[][] isVisitied;
+  private boolean[][] isVisited;
   private char[][] placeInfos;
 
   public int[] solution(String[][] places) {
@@ -38,7 +38,7 @@ public class Solution3 {
       this.placeInfos[i] = place[i].toCharArray();
     }
 
-    this.isVisitied = new boolean[PLACE_H][PLACE_W];
+    this.isVisited = new boolean[PLACE_H][PLACE_W];
 
     for (int h = 0; h < PLACE_H; h++) {
       for (int w = 0; w < PLACE_W; w++) {
@@ -67,14 +67,14 @@ public class Solution3 {
       return 0;
     }
 
-    isVisitied[x][y] = true;
+    isVisited[x][y] = true;
     int result = 1;
 
     for (Direction direction : Direction.values()) {
       int nextX = x + direction.dx;
       int nextY = y + direction.dy;
 
-      if (nextX < 0 || PLACE_H <= nextX || nextY < 0 || PLACE_W <= nextY || isVisitied[nextX][nextY]) {
+      if (nextX < 0 || PLACE_H <= nextX || nextY < 0 || PLACE_W <= nextY || isVisited[nextX][nextY]) {
         continue;
       }
 
@@ -82,7 +82,7 @@ public class Solution3 {
     }
 
     if (depth != 0 ) {
-      isVisitied[x][y] = false;
+      isVisited[x][y] = false;
     }
 
     return result;
@@ -105,9 +105,5 @@ public class Solution3 {
       this.dx = dx;
       this.dy = dy;
     }
-  }
-
-  public static void main(String[] args) {
-    System.out.println(new Solution3().solution(new String[][]{{"POOOP", "OXXOX", "OPXPX", "OOXOX", "POXXP"}})[0]);
   }
 }

@@ -112,8 +112,4 @@ public class Solution4 {
       this.dy = dy;
     }
   }
-
-  public static void main(String[] args) {
-    new Solution4().solution(new int[][]{{1, 0, 0, 3},{2, 0, 0, 0},{0, 0, 0, 2},{3, 0, 1, 0}}, 1, 0);
-  }
 }
