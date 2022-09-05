@@ -65,6 +65,17 @@
 ### 폴더 및 파일명
 - 모의테스트는 `mockTest{number}` , 자유문제는 `freePS` 폴더를 이용한다.
 - 파일명은 `{문제 순번 혹은 문제번호}-{작성자 이름}.{js/java}`으로 작성한다.
+- 파일 최상단에는 다음과 같은 주석을 기록한다.
+  ```
+  // 사이트 이름 / 문제번호 / 문제이름
+  // 문제 바로가기 링크
+  // 풀이여부: 소요시간
+  
+  ex) 
+  // 프로그래머스 / 77886 / 옮기기
+  // https://school.programmers.co.kr/learn/courses/30/lessons/77886
+  // solve: 30분
+  ```
 
 ### Commit Message
 - commit message는 다음과 같은 방식을 따른다.
