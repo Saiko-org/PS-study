@@ -9,24 +9,47 @@ function solution(play_time, adv_time, logs) {
     return 60 * 60 * parseInt(hh, 10) + 60 * parseInt(mm, 10) + parseInt(ss, 10)
   }
 
-  const MAX_SECONDS = convertTimeStringToSeconds(play_time)
-  const sums = new Array(MAX_SECONDS + 1).fill(0)
+  const convertSecondsToTimeString = (seconds) => {
+    const hh = Math.floor(seconds / (60 * 60))
+    const mm = Math.floor((seconds - hh * 60 * 60) / 60)
+    const ss = seconds - hh * 60 * 60 - mm * 60
+
+    return `${hh < 10 ? '0' + hh : hh}:${mm < 10 ? '0' + mm : mm}:${
+      ss < 10 ? '0' + ss : ss
+    }`
+  }
+
+  const playSeconds = convertTimeStringToSeconds(play_time)
+  const advSeconds = convertTimeStringToSeconds(adv_time)
+  const sums = new Array(playSeconds + 1).fill(0)
 
   logs.forEach((log) => {
     const [startTimeString, finishTimeString] = log.split('-')
 
     const startSeconds = convertTimeStringToSeconds(startTimeString)
     const finishSeconds = convertTimeStringToSeconds(finishTimeString)
-    const playingTime = finishSeconds - startSeconds
 
-    for (let i = startSeconds + 1; i <= finishSeconds; i++) {
-      sums[i] += 1
-    }
-
-    sums[finishSeconds + 1] -= playingTime
+    sums[startSeconds]++
+    sums[finishSeconds]--
   })
 
   for (let i = 0; i < sums.length - 1; i++) {
     sums[i + 1] += sums[i]
   }
+
+  for (let i = 0; i < sums.length - 1; i++) {
+    sums[i + 1] += sums[i]
+  }
+
+  let max = sums[advSeconds]
+  let startSeconds = 0
+
+  for (let time = advSeconds + 1; time < playSeconds; time++) {
+    if (max < sums[time] - sums[time - advSeconds]) {
+      max = sums[time] - sums[time - advSeconds]
+      startSeconds = time - advSeconds + 1
+    }
+  }
+
+  return convertSecondsToTimeString(startSeconds)
 }
