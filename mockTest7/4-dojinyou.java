@@ -1,114 +1,77 @@
 /**
  * 프로그래머스 / 77886 / 옮기기
  * https://school.programmers.co.kr/learn/courses/30/lessons/77886
- * fail : 1시간
+ * fail : 1시간, add : 로직 참고(15분)
  */
+
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 public class Solution {
 
-  char[] char110 = new char[]{'1', '1', '0'};
+  Deque<Character> deque;
 
-  public String[] solution(String[] s) {
-    return getMinStrings(s);
-  }
+  public String[] solution(String[] originStringArray) {
+    String[] reorderedStringArray = new String[originStringArray.length];
 
-  private String[] getMinStrings(String[] s) {
-    String[] results = new String[s.length];
-
-    for (int i = 0; i < s.length; i++) {
-      results[i] = getMinString(s[i]);
+    for (int i = 0; i < reorderedStringArray.length; i++) {
+      reorderedStringArray[i] = gerReorderString(originStringArray[i]);
     }
 
-    return results;
+    return reorderedStringArray;
   }
 
-  private String getMinString(String s) {
-    String next = getNextString(s);
+  private String gerReorderString(String originString) {
+    deque = new ArrayDeque<>(originString.length());
 
-    if (s.equals(next)) {
-      return next;
+    int count110 = getCount110(originString);
+    if (count110 == 0) {
+      return originString;
     }
 
-    return getMinString(next);
+    return makeReorderString(count110);
   }
 
-  private String getNextString(
-      String prevString
-  ) {
-    char[] charArray = prevString.toCharArray();
-    int index110 = -1;
-    int changeIndex = -1;
-    int currentIndex = -1;
-    while (currentIndex + 1 < charArray.length) {
-      currentIndex++;
+  private String makeReorderString(int count110) {
+    StringBuilder sb = new StringBuilder();
+    boolean notFind0 = true;
 
-      if (check110(charArray, currentIndex)) {
-        index110 = currentIndex;
-        continue;
+    while (!deque.isEmpty()) {
+      char c = deque.pop();
+      if (notFind0 && c == '0') {
+        sb.append("011".repeat(count110));
+        notFind0 = false;
       }
-
-      if (changeIndex == -1 && overThan110(charArray, currentIndex)) {
-        changeIndex = currentIndex;
-      }
+      sb.append(c);
     }
 
-    if (index110 == -1 || changeIndex == -1) {
-      return prevString;
+    if (notFind0) {
+      sb.append("011".repeat(count110));
     }
 
-    return subString(charArray, index110, changeIndex);
+    return sb
+        .reverse()
+        .toString();
   }
 
-  private boolean overThan110(
-      char[] charArray,
-      int currentIndex
-  ) {
-    for (int i = 0; i < char110.length; i++) {
-      if (charArray.length <= currentIndex + i) {
-        return true;
+  private int getCount110(String originString) {
+    int count110 = 0;
+
+    for (int i = 0; i < originString.length(); i++) {
+      if (originString.charAt(i) == '0' && 2 <= deque.size()) {
+        char prev1 = deque.pop();
+        char prev2 = deque.pop();
+
+        if (prev1 == '1' && prev2 == '1') {
+          count110++;
+          continue;
+        }
+        deque.push(prev2);
+        deque.push(prev1);
       }
 
-      if (charArray[currentIndex + i] < char110[i]) {
-        return false;
-      }
+      deque.push(originString.charAt(i));
     }
-    return true;
+    return count110;
   }
-
-  private String subString(
-      char[] charArray,
-      int index110,
-      int changeIndex
-  ) {
-    StringBuilder sb = new StringBuilder(charArray.length);
-
-    for (int i = 0; i < charArray.length; i++) {
-      if (index110 <= i && i <= index110 + 2) {
-        continue;
-      }
-
-      if (i == changeIndex) {
-        sb.append(charArray[index110]);
-        sb.append(charArray[index110 + 1]);
-        sb.append(charArray[index110 + 2]);
-      }
-
-      sb.append(charArray[i]);
-    }
-
-    return sb.toString();
-  }
-
-  private boolean check110(
-      char[] charArray,
-      int currentIdx
-  ) {
-    for (int i = 0; i < char110.length; i++) {
-      if (charArray.length <= currentIdx + i || charArray[currentIdx + i] != char110[i]) {
-        return false;
-      }
-    }
-    return true;
-  }
-
 }
