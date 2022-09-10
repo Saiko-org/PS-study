@@ -1,3 +1,5 @@
+// 프로그래머스 / 모의테스트 10-4 / 합승 택시 요금
+// https://school.programmers.co.kr/learn/courses/30/lessons/72413
 // solve: 34분
 
 function solution(n, s, a, b, fares) {

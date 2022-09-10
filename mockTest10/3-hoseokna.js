@@ -1,3 +1,5 @@
+// 프로그래머스 / 모의테스트 10-3 / 메뉴 리뉴얼
+// https://school.programmers.co.kr/learn/courses/30/lessons/72411
 // solve: 30분
 
 function solution(orders, course) {
