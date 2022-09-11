@@ -1,6 +1,7 @@
 // 프로그래머스 / 72413 / 합승 택시 요금
 // https://school.programmers.co.kr/learn/courses/30/lessons/72413
 // fail: 1시간 (정확성 50/50, 효율성 46.7/50)
+// add: 20분
 
 function solution(n, s, a, b, fares) {
   let answer = 200 * 100000 + 1;
@@ -21,7 +22,13 @@ function solution(n, s, a, b, fares) {
       const current = queue.shift();
 
       for (const [next, nextFare] of graph[current]) {
-        if (nextFare + fareBoard[current] < fareBoard[next]) {
+        // 이전에 계산된 최저요금보다 더 낮은 방법인지 확인
+        // &&
+        // 답안보다 더 작은 최저요금인지 확인 (이 조건 없으면 효율성 7번, 8번 실패)
+        if (
+          nextFare + fareBoard[current] < fareBoard[next] &&
+          nextFare + fareBoard[current] < answer
+        ) {
           fareBoard[next] = nextFare + fareBoard[current];
           queue.push(next);
         }
