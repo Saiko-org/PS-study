@@ -1,3 +1,9 @@
+/**
+ * 프로그래머스 / 72414 / 광고 삽입
+ * https://school.programmers.co.kr/learn/courses/30/lessons/72414
+ * add:
+ */
+
 class Solution {
     
      String changeSecondToTime(long second){
