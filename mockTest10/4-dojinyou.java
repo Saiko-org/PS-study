@@ -1,20 +1,16 @@
 /**
  *  프로그래머스 / 72413 / 합승 택시 요금
  *  https://school.programmers.co.kr/learn/courses/30/lessons/72413
- *  fail: 1시간
+ *  fail: 1시간, add: 풀이법 생각나서 다시 품
  */
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class Solution {
-  int startPoint;
   int[][] fareTable;
   int[] minCostFromStart;
-  Map<Integer, List<Integer>> minCostRouteFromStart;
+  int[] minCostFromA;
+  int[] minCostFromB;
 
   public int solution(
       int n,
@@ -25,44 +21,37 @@ public class Solution {
   ) {
     initFareTable(n, fares);
 
-    updateMinCost(n, s);
+    minCostFromStart = getMinCostFrom(s);
+    minCostFromA = getMinCostFrom(a);
+    minCostFromB = getMinCostFrom(b);
 
-    return getSumMinCost(a, b);
+    return getMinSumCost();
   }
 
-  private int getSumMinCost(
-      int a,
-      int b
-  ) {
-    int sumCost = minCostFromStart[a] + minCostFromStart[b];
-    List<Integer> routeA = minCostRouteFromStart.get(a);
-    List<Integer> routeB = minCostRouteFromStart.get(b);
+  private int getMinSumCost() {
+    int minSumCost = Integer.MAX_VALUE;
 
-    int prev = startPoint;
-    for (int i = 0; i < Math.min(routeA.size(), routeB.size()); i++) {
-      if (routeA.get(i) != routeB.get(i)) {
-        break;
-      }
-      sumCost -= fareTable[prev][i];
-      prev = i;
+    for (int i = 1; i < minCostFromStart.length; i++) {
+      int sumCost = minCostFromStart[i] + minCostFromA[i] + minCostFromB[i];
+      minSumCost = Math.min(minSumCost, sumCost);
     }
 
-    return sumCost;
+    return minSumCost;
   }
 
-  private void updateMinCost(
-      int numOfPoints,
-      int startPoint
-  ) {
-    this.startPoint = startPoint;
-    initMinCost(numOfPoints);
-    boolean[] visited = new boolean[numOfPoints + 1];
-    visited[0] = true;
+  private int[] getMinCostFrom(int startPoint) {
+    int[] minCost = new int[fareTable.length];
+    Arrays.fill(minCost, Integer.MAX_VALUE);
+    minCost[startPoint] = 0;
+    boolean[] visited = new boolean[fareTable.length];
 
-    updateCostAndRoute(visited, startPoint);
+    updateCost(minCost, visited, startPoint);
+
+    return minCost;
   }
 
-  private void updateCostAndRoute(
+  private void updateCost(
+      int[] minCosts,
       boolean[] visited,
       int currentPoint
   ) {
@@ -70,53 +59,36 @@ public class Solution {
     for (int i = 1; i < fareTable[currentPoint].length; i++) {
       int cost = fareTable[currentPoint][i];
 
-      if (cost == 0 || (currentPoint != startPoint
-          && minCostFromStart[currentPoint] == Integer.MAX_VALUE)
-          || minCostFromStart[i] <= minCostFromStart[currentPoint] + cost) {
+      if (cost == 0 ||
+          minCosts[currentPoint] == Integer.MAX_VALUE ||
+          minCosts[i] <= minCosts[currentPoint] + cost) {
         continue;
       }
 
-      minCostFromStart[i] = minCostFromStart[currentPoint] + cost;
-      List<Integer> routeCurrent = minCostRouteFromStart.get(currentPoint);
-      List<Integer> routePrev = minCostRouteFromStart.get(i);
-
-      routePrev.clear();
-      routePrev.addAll(routeCurrent);
-      routePrev.add(currentPoint);
+      minCosts[i] = minCosts[currentPoint] + cost;
     }
 
-    int nextPoint = getMinCostPoint(visited);
+    int nextPoint = getMinCostPoint(minCosts, visited);
     if (nextPoint != 0) {
-      updateCostAndRoute(visited, nextPoint);
+      updateCost(minCosts, visited, nextPoint);
     }
   }
 
-  private int getMinCostPoint(boolean[] visited) {
+  private int getMinCostPoint(int[] minCosts, boolean[] visited) {
     int minCostPoint = 0;
     int minCost = Integer.MAX_VALUE;
-    for (int i = 1; i < minCostFromStart.length; i++) {
+    for (int i = 1; i < minCosts.length; i++) {
       if (visited[i]) {
         continue;
       }
 
-      int cost = minCostFromStart[i];
+      int cost = minCosts[i];
       if (cost < minCost) {
         minCost = cost;
         minCostPoint = i;
       }
     }
     return minCostPoint;
-  }
-
-  private void initMinCost(int numOfPoints) {
-    minCostFromStart = new int[numOfPoints + 1];
-    Arrays.fill(minCostFromStart, Integer.MAX_VALUE);
-    minCostFromStart[startPoint] = 0;
-
-    minCostRouteFromStart = new HashMap<>();
-    for (int i = 1; i <= numOfPoints; i++) {
-      minCostRouteFromStart.put(i, new ArrayList<>());
-    }
   }
 
   private void initFareTable(
