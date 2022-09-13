@@ -1,33 +1,30 @@
+// 프로그래머스 / 42891 / 무지의 먹방 라이브
+// https://school.programmers.co.kr/learn/courses/30/lessons/42891?language=javascript
+// add: 참고 https://velog.io/@hadam/JS-Q06-%EB%AC%B4%EC%A7%80%EC%9D%98-%EB%A8%B9%EB%B0%A9-%EB%9D%BC%EC%9D%B4%EB%B8%8C
+
 function solution(food_times, k) {
-  if (k < food_times.length) {
-    return k
-  }
+  const FAIL = -1
+  const SIZE = food_times.length
+  const foods = food_times
+    .map((time, index) => ({ time, id: index + 1 }))
+    .sort((a, b) => a.time - b.time)
 
-  const sum = food_times.reduce((acc, cur) => acc + cur)
+  let prevTime = 0
 
-  if (sum <= k) {
-    return -1
-  }
+  for (let i = 0; i < SIZE; i++) {
+    const currentTime = foods[i].time
+    const remainCount = SIZE - i
+    const eatTime = (currentTime - prevTime) * remainCount
 
-  food_times = food_times.map((time, index) => ({ time, id: index + 1 }))
+    if (eatTime > k) {
+      const remainFoods = foods.slice(i).sort((a, b) => a.id - b.id)
 
-  while (true) {
-    let min = Infinity
-
-    food_times.forEach(({ time }) => (min = Math.min(min, time)))
-
-    if (food_times.length * min < k) {
-      k -= min * food_times.length
-      food_times = food_times
-        .map(({ time, id }) => ({
-          time: (time -= min),
-          id,
-        }))
-        .filter(({ time }) => time !== 0)
-
-      continue
+      return remainFoods[k % remainCount].id
     }
 
-    food_times.forEach((time) => (time -= min))
+    prevTime = currentTime
+    k -= eatTime
   }
+
+  return FAIL
 }
