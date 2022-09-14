@@ -1,64 +1,40 @@
 // 프로그래머스 / 17685 / 자동완성
 // https://school.programmers.co.kr/learn/courses/30/lessons/17685
-// fail: 1시간
-
-function Node(data = '') {
-  this.data = data
-  this.children = new Map()
-}
-
-function Trie() {
-  const head = new Node()
-
-  this.insert = (word) => {
-    let currentNode = head
-
-    for (const char of word) {
-      const node = new Node(word)
-      const prevValue = currentNode.children.get(char) || []
-
-      prevValue.push(node)
-      currentNode.children.set(char, prevValue)
-
-      currentNode = node
-    }
-  }
-
-  this.getCountFindingWord = (word) => {
-    let count = 0
-    let currentNode = head
-    let currentWord = ''
-
-    console.log('???', word)
-
-    for (const char of word) {
-      count++
-      currentWord += char
-
-      const children = currentNode.children
-      console.log(char, children, children.get(char).length)
-
-      const filtered = children
-        .get(char)
-        .filter(({ data }) => data.includes(currentWord))
-
-      if (filtered.length === 1) {
-        console.log('count1', count, currentWord, filtered)
-        return count + 1
-      }
-
-      currentNode = filtered.filter(({ data }) => data === word)[0]
-    }
-
-    console.log('count2', count)
-    return count
-  }
-}
+// add: 참고 https://maruzzing.github.io/study/algorithm/LEVEL4_%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%A8%B8%EC%8A%A4_%EC%9E%90%EB%8F%99%EC%99%84%EC%84%B1/
 
 function solution(words) {
-  const trie = new Trie()
+  const trie = new Map()
 
-  words.forEach((word) => trie.insert(word))
+  words.forEach((word) => {
+    let currentTrie = trie
 
-  return words.reduce((acc, cur) => (acc += trie.getCountFindingWord(cur)), 0)
+    for (const char of word) {
+      if (currentTrie.has(char)) {
+        const { count, trie } = currentTrie.get(char)
+
+        currentTrie.set(char, { count: count + 1, trie })
+      } else {
+        currentTrie.set(char, { count: 1, trie: new Map() })
+      }
+
+      currentTrie = currentTrie.get(char).trie
+    }
+  })
+
+  return words.reduce((acc, cur) => {
+    let currentTrie = trie
+    let count = 0
+
+    for (const char of cur) {
+      count++
+
+      if (currentTrie.get(char).count === 1) {
+        break
+      }
+
+      currentTrie = currentTrie.get(char).trie
+    }
+
+    return (acc += count)
+  }, 0)
 }
