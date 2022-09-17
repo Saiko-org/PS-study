@@ -1,7 +1,7 @@
 /**
  * 프로그래머스 / 42894/ 블록 게임
  * https://school.programmers.co.kr/learn/courses/30/lessons/42894
- * fail: 1시간
+ * add: 위의 막혀 있는 벽돌 체크하는 조건을 비어있는 공간일 때만 체크하도록 수정 (emptyPoints)
  */
 
 function solution(board) {
@@ -84,6 +84,7 @@ function solution(board) {
   )
 
   let isDeleted = false
+
   while (true) {
     isDeleted = false
     Array.from(map).forEach(([key, values], index) => {
@@ -100,14 +101,7 @@ function solution(board) {
       })
 
       const type = parseInt(key, 10)
-
-      for (let y = 0; y < minY; y++) {
-        for (let x = minX; x <= maxX; x++) {
-          if (board[y][x] !== 0) {
-            return
-          }
-        }
-      }
+      const emptyPoints = []
 
       for (let y = minY; y <= maxY; y++) {
         for (let x = minX; x <= maxX; x++) {
@@ -116,6 +110,21 @@ function solution(board) {
           }
 
           if (board[y][x] !== 0 && board[y][x] !== type) {
+            return
+          }
+
+          if (board[y][x] === 0) {
+            emptyPoints.push({ y, x })
+          }
+        }
+      }
+
+      for (let y = 0; y < minY; y++) {
+        for (let x = minX; x <= maxX; x++) {
+          if (
+            board[y][x] !== 0 &&
+            !emptyPoints.every(({ x: _x }) => x !== _x)
+          ) {
             return
           }
         }
