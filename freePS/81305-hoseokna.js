@@ -4,6 +4,7 @@
  * add: https://ltk3934.tistory.com/184
  *
  * js에서는 효율성에서 런타임 에러(스택 초과).
+ * dfs 반복문으로 수정(https://degurii.tistory.com/231)
  */
 
 function Tree(id) {
@@ -30,31 +31,58 @@ function solution(k, num, links) {
     }
   })
 
-  const rootId = trees.findIndex(({ parent }) => parent === -1)
+  const dfs = (rootId, max) => {
+    const stack = [trees[rootId]]
+    const result = new Map()
 
-  let groupCount = 1
+    result.set(-1, { sum: 0, groupCount: 0 })
 
-  const dfs = (id, max) => {
-    const left = trees[id].left
-    const leftSum = left !== -1 ? dfs(left, max) : 0
-    const right = trees[id].right
-    const rightSum = right !== -1 ? dfs(right, max) : 0
+    while (stack.length > 0) {
+      const { id, left, right } = stack[stack.length - 1]
 
-    if (num[id] + leftSum + rightSum <= max) {
-      return num[id] + leftSum + rightSum
+      if (!result.has(left)) {
+        stack.push(trees[left])
+
+        continue
+      }
+
+      if (!result.has(right)) {
+        stack.push(trees[right])
+
+        continue
+      }
+
+      stack.pop()
+
+      const currentResult = {
+        sum: num[id],
+        groupCount: result.get(left).groupCount + result.get(right).groupCount,
+      }
+      const leftSum = result.get(left).sum
+      const rightSum = result.get(right).sum
+
+      result.set(id, currentResult)
+
+      if (num[id] + leftSum + rightSum <= max) {
+        currentResult.sum += leftSum + rightSum
+
+        continue
+      }
+
+      if (num[id] + Math.min(leftSum, rightSum) <= max) {
+        currentResult.sum += Math.min(leftSum, rightSum)
+        currentResult.groupCount += 1
+
+        continue
+      }
+
+      currentResult.groupCount += 2
     }
 
-    if (num[id] + Math.min(leftSum, rightSum) <= max) {
-      groupCount += 1
-
-      return num[id] + Math.min(leftSum, rightSum)
-    }
-
-    groupCount += 2
-
-    return num[id]
+    return result.get(rootId).groupCount + 1
   }
 
+  const rootId = trees.findIndex(({ parent }) => parent === -1)
   const MAX = Math.max(...num)
   let left = MAX
   let right = MAX * N
@@ -62,10 +90,7 @@ function solution(k, num, links) {
   while (left < right) {
     const mid = Math.floor((left + right) / 2)
 
-    groupCount = 1
-    dfs(rootId, mid)
-
-    if (groupCount <= k) {
+    if (dfs(rootId, mid) <= k) {
       right = mid
     } else {
       left = mid + 1
