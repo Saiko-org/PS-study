@@ -1,0 +1,173 @@
+/**
+ * 프로그래머스 / 118669 / 등산코스 정하기
+ * https://school.programmers.co.kr/learn/courses/30/lessons/118669
+ * add:  
+ */
+
+import java.util.*;
+
+
+class Spot {
+
+  private int num;
+  private int time;
+
+  Spot(int num, int time) {
+    this.num = num;
+    this.time = time;
+  }
+
+  public int getNum() {
+    return num;
+  }
+
+  public int getTime() {
+    return time;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Spot spot = (Spot) o;
+    return num == spot.num && time == spot.time;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(num, time);
+  }
+}
+
+class Node {
+
+  private int num;
+  private int intensity;
+
+  Node(int num, int intensity) {
+    this.num = num;
+    this.intensity = intensity;
+  }
+
+  public int getIntensity() {
+    return intensity;
+  }
+
+  public int getNum() {
+    return num;
+  }
+}
+
+class Solution {
+    Map<Integer, Set<Spot>> edges = new HashMap<>();
+    Set<Integer> gateSet = new HashSet<>();
+    Set<Integer> summitSet = new HashSet<>();
+
+    public int[] solution(int n, int[][] paths, int[] gates, int[] summits) {
+        initGates(gates);
+        initSummits(summits);
+        initEdges(n, paths);
+
+        int answer[] = new int[2];
+        answer[1] = Integer.MAX_VALUE;
+        int[] intensity = solve(n);
+
+        for (int i = 1; i <= n; i++) {
+          if (isSummit(i)) {
+            if (answer[1] > intensity[i]) {
+              answer[0] = i;
+              answer[1] = intensity[i];
+            }
+          }
+        }
+        return answer;
+    }
+
+    
+    public int[] solve(int n) {
+
+    int intensity[] = new int[n + 1]; // 각 지점들까지의 Intensity dp
+    Arrays.fill(intensity, Integer.MAX_VALUE);
+
+    Queue<Node> queue = new PriorityQueue<>(Comparator.comparingInt(Node::getIntensity));
+    for (int num : gateSet) {
+      queue.add(new Node(num, 0));
+    }
+
+    while (!queue.isEmpty()) {
+      Node node = queue.poll();
+      if (isSummit(node.getNum())) { // 어떤 산봉우리에 도착했음
+        intensity[node.getNum()] = Math.min(intensity[node.getNum()], node.getIntensity());
+        continue;
+      }
+
+      if (node.getIntensity() > intensity[node.getNum()]) {
+        continue;
+      }
+
+        
+      Set<Spot> spots = edges.get(node.getNum());
+      for (Spot spot : spots) {
+        if (intensity[spot.getNum()] > Math.max(node.getIntensity(), spot.getTime())) {
+          intensity[spot.getNum()] = Math.max(node.getIntensity(), spot.getTime());
+          queue.add(new Node(spot.getNum(), Math.max(node.getIntensity(), spot.getTime())));
+        }
+      }
+    }
+    return intensity;
+  }
+
+  private void initSummits(int[] summits) {
+    for (int num : summits) {
+      summitSet.add(num);
+    }
+  }
+
+  private void initGates(int[] gates) {
+    for (int num : gates) {
+      gateSet.add(num);
+    }
+  }
+
+  private void initEdges(int n, int[][] paths) {
+
+    for (int i = 1; i <= n; i++) {
+      edges.put(i, new HashSet<>());
+    }
+
+    for (int i = 0; i < paths.length; i++) {
+      int s = paths[i][0];
+      int e = paths[i][1];
+      int w = paths[i][2];
+
+      // s: 어떤 지점 e: 출발지점
+      // 이렇게 해주는 이유는 출발 지점을 하나만 가야 하기 때문
+      // s: 산봉우리 e: 어떤지점
+      // 이렇게 해주는 이유는 산봉우리에서 다른 지점을 가면 안되기 때문
+      if (isGate(e) || isSummit(s)) {
+        edges.get(e).add(new Spot(s, w));
+        continue;
+      }
+      if (isGate(s) || isSummit(e)) {
+        edges.get(s).add(new Spot(e, w));
+        continue;
+      }
+      edges.get(s).add(new Spot(e, w));
+      edges.get(e).add(new Spot(s, w));
+
+    }
+  }
+
+  private boolean isGate(int n) {
+    return gateSet.contains(n);
+  }
+
+  private boolean isSummit(int n) {
+    return summitSet.contains(n);
+  }
+}
+
