@@ -1,96 +1,60 @@
 /**
  * 프로그래머스 / 131129 / 카운트 다운
  * https://school.programmers.co.kr/learn/courses/30/lessons/131129
- * fail: 1시간
+ * add
+ * 참고링크
+ * (https://my-first-programming.tistory.com/entry/%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%A8%B8%EC%8A%A4-%EC%B9%B4%EC%9A%B4%ED%8A%B8-%EB%8B%A4%EC%9A%B4-javascript)
  */
 
 function solution(target) {
+  const MAX_TARGET = 100000
   const MAX_SCORE = 20
   const BOOL_SCORE = 50
-  let scores = Array.from(new Array(20), (_, index) => MAX_SCORE - index)
-  const q = [{ sum: 0, singleCount: 0, boolCount: 0, totalCount: 0 }]
+  const scores = Array.from(new Array(20), (_, index) => MAX_SCORE - index)
+  const dp = Array.from(new Array(MAX_TARGET * 3), () => ({
+    count: Infinity,
+    sumSingleAndBool: 0,
+  }))
 
-  while (q.length > 0) {
-    const { sum, singleCount, boolCount, totalCount } = q.shift()
+  dp[0].count = 0
 
-    if (sum === target) {
-      return [totalCount, singleCount + boolCount]
+  for (let currentScore = 0; currentScore < target; currentScore++) {
+    const updateDp = (addedScore, signleCount) => {
+      const nextScore = currentScore + addedScore
+      const nextCount = dp[currentScore].count + 1
+      if (dp[nextScore].count < nextCount) {
+        return
+      }
+
+      if (dp[nextScore].count === nextCount) {
+        dp[nextScore].sumSingleAndBool = Math.max(
+          dp[nextScore].sumSingleAndBool,
+          dp[currentScore].sumSingleAndBool + signleCount
+        )
+      } else {
+        dp[nextScore] = {
+          count: nextCount,
+          sumSingleAndBool: dp[currentScore].sumSingleAndBool + signleCount,
+        }
+      }
     }
 
     scores.forEach((score) => {
-      const nextTotalCount = totalCount + 1
-
-      if (sum + 2 * score === target) {
-        q.unshift({
-          sum: sum + 2 * score,
-          singleCount,
-          boolCount,
-          totalCount: nextTotalCount,
-        })
-      }
-
-      if (sum + 3 * score === target) {
-        q.unshift({
-          sum: sum + 3 * score,
-          singleCount,
-          boolCount,
-          totalCount: nextTotalCount,
-        })
-      }
-
-      if (sum + score === target) {
-        q.unshift({
-          sum: sum + score,
-          singleCount: singleCount + 1,
-          boolCount,
-          totalCount: nextTotalCount,
-        })
-      }
-
-      if (sum + BOOL_SCORE === target) {
-        q.unshift({
-          sum: sum + BOOL_SCORE,
-          singleCount,
-          boolCount: boolCount + 1,
-          totalCount: nextTotalCount,
-        })
-      }
-
-      if (sum + BOOL_SCORE < target) {
-        q.push({
-          sum: sum + BOOL_SCORE,
-          singleCount,
-          boolCount: boolCount + 1,
-          totalCount: nextTotalCount,
-        })
-      }
-
-      if (sum + score < target) {
-        q.push({
-          sum: sum + score,
-          singleCount: singleCount + 1,
-          boolCount,
-          totalCount: nextTotalCount,
-        })
-      }
-
-      if (sum + 3 * score < target) {
-        q.push({
-          sum: sum + 3 * score,
-          singleCount,
-          boolCount,
-          totalCount: nextTotalCount,
-        })
-      }
-
-      if (sum + 2 * score < target) {
-        q.push({
-          sum: sum + 2 * score,
-          singleCount,
-          boolCount,
-          totalCount: nextTotalCount,
-        })
-      }
+      ;[
+        [1, 1],
+        [2, 0],
+        [3, 0],
+      ].forEach(([v, signleCount]) => {
+        updateDp(score * v, signleCount)
+      })
     })
+
+    updateDp(BOOL_SCORE, 1)
   }
+
+  const { count, sumSingleAndBool } = dp[target]
+
+  return [count, sumSingleAndBool]
 }
+
+solution(58)
