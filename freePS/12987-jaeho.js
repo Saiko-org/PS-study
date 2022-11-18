@@ -1,51 +1,27 @@
-// 프로그래머스 / 12987 / 배달 (Lv2 Summer/Winter Coding(~2018))
+// 프로그래머스 / 12987 / 숫자 게임 (Lv3 Summer/Winter Coding(~2018))
 // https://school.programmers.co.kr/learn/courses/30/lessons/12987
-// solve: 22분
+// solve: 40분
+// A의 숫자보다 가장 작은 차이로 이길 수 있는 수를 골라내면 O(N)으로 해결가능
 
-function solution(N, road, K) {
-  const board = new Map();
-  const distance = Array.from({ length: N + 1 }, () => Infinity);
-  distance[1] = 0;
+function solution(A, B) {
+  let answer = 0;
 
-  const bfs = (start) => {
-    const queue = [];
-    queue.push(board.get(start));
+  A.sort((a, b) => a - b);
+  B.sort((a, b) => a - b);
 
-    while (queue.length) {
-      const towns = queue.shift();
+  let indexB = 0;
+  for (let index = 0; index < A.length; index++) {
+    const numberA = A[index];
 
-      towns.forEach((town) => {
-        const [from, to, weight] = town;
-
-        // 백트래킹
-        if (
-          distance[from] + weight < distance[to] &&
-          distance[from] + weight <= K
-        ) {
-          distance[to] = distance[from] + weight;
-          queue.push(board.get(to));
-        }
-      });
+    while (indexB < B.length && numberA >= B[indexB]) {
+      indexB += 1;
     }
-  };
-
-  // 연결된 마을 및 거리 저장
-  road.forEach((value) => {
-    const [from, to, weight] = value;
-    if (board.has(from)) {
-      board.get(from).push([from, to, weight]);
-    } else {
-      board.set(from, [[from, to, weight]]);
+    if (indexB === B.length) {
+      break;
     }
+    indexB += 1;
+    answer += 1;
+  }
 
-    if (board.has(to)) {
-      board.get(to).push([to, from, weight]);
-    } else {
-      board.set(to, [[to, from, weight]]);
-    }
-  });
-
-  bfs(1);
-
-  return distance.filter((value) => value !== Infinity).length;
+  return answer;
 }
